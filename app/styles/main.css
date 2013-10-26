@@ -1,7 +1,9 @@
+@import url(http://fonts.googleapis.com/css?family=Share+Tech);
+
 body {
-    background: #fafafa;
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: #333;
+    background: black;
+    
+    color: white;
 }
 
 .hero-unit {
@@ -10,16 +12,41 @@ body {
     font-size: 18px;
     font-weight: 200;
     line-height: 30px;
-    background-color: #eee;
+    background-color: rgba(30, 31, 46, 0.96);
     border-radius: 6px;
     padding: 60px;
     overflow: hidden;
 }
 
-.hero-unit h2 {
+h1 {
+    font-family: 'Share Tech', sans-serif;
+    font-size: 60px;
     text-align: center;
 }
 
 .left-col, .right-col {
     padding: 10px;
+}
+
+.loading {
+    width: 64px;
+    height: 64px;
+    border-radius: 5px;
+    position: absolute;
+    left:45%;
+    top: 45%;
+
+    background: -moz-linear-gradient(top,  rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.8) 100%); /* FF3.6+ */
+    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.8)), color-stop(100%,rgba(0,0,0,0.8))); /* Chrome,Safari4+ */
+    background: -webkit-linear-gradient(top,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* Chrome10+,Safari5.1+ */
+    background: -o-linear-gradient(top,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* Opera 11.10+ */
+    background: -ms-linear-gradient(top,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* IE10+ */
+    background: linear-gradient(to bottom,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* W3C */
+    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', endColorstr='#cc000000',GradientType=0 ); /* IE6-9 */
+}
+
+.loader {
+    position: absolute;
+    left: 7px;
+    top: 7px;
 }

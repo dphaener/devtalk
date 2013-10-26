@@ -2,18 +2,24 @@
 
 angular.module('devtalkApp')
   .controller('NewUserCtrl', function ($scope, $http, $location) {
+
     $scope.firstName = '';
     $scope.lastName = '';
     $scope.nickName = '';
     $scope.email = '';
+    $scope.loading = false;
 
     $scope.addUser = function () {
+      $scope.loading = true;
       if ($scope.firstName === '') {
+        $scope.loading = false;
         alert('First name is required!');
         return;
       } else if ($scope.lastName === '') {
+        $scope.loading = false;
         alert('Last name is required!');
       } else if ($scope.email === '') {
+        $scope.loading = false;
         alert('Email is required!');
       } else {
         $http({
@@ -26,6 +32,7 @@ angular.module('devtalkApp')
             "email": $scope.email
           }
         }).success(function (data, status, headers, config) {
+          $scope.loading = false;
           alert('New user succesfully added!');
           $location.path('/');
         })

@@ -4,6 +4,7 @@ angular.module('devtalkApp')
   .controller('MainCtrl', function ($scope, $http, $rootScope, $location) {
 
     $scope.selectedUser = 0;
+    $scope.loading = true;
 
     $http({
     	method: 'GET',
@@ -20,7 +21,8 @@ angular.module('devtalkApp')
                 id: data[i]._id
             });
     	}
-        $scope.selectedUser = $scope.users[0].id
+        $scope.selectedUser = $scope.users[0].id;
+        $scope.loading = false;
     });
 
     $scope.editUser = function () {
