@@ -1,20 +1,29 @@
 'use strict';
 
 angular.module('devtalkApp')
-  .controller('MainCtrl', function ($scope, $http) {
+  .controller('MainCtrl', function ($scope, $http, $rootScope, $location) {
+
+    $scope.selectedUser = 0;
+
     $http({
     	method: 'GET',
     	url: 'http://geekwise-angularjs.herokuapp.com/darin/users'
     }).success(function (data, status, headers, config) {
-    	$scope.userNames = [];
+    	$scope.users = [];
     	var i;
     	for (i = 0; i < data.length; i++) {
-    		$scope.userNames.push(data[i].firstName + ' ' + data[i].lastName);
+    		$scope.users.push({
+                firstName: data[i].firstName,
+                lastName: data[i].lastName,
+                nickName: data[i].nickName,
+                email: data[i].email,
+                id: data[i]._id
+            });
     	}
-    })
-    $scope.awesomeThings = [
-      'HTML5 Boilerplate',
-      'AngularJS',
-      'Karma'
-    ];
+        $scope.selectedUser = $scope.users[0].id
+    });
+
+    $scope.editUser = function () {
+        $location.path('/edit_user/' + $scope.selectedUser);
+    }
   });

@@ -11,6 +11,14 @@ angular.module('devtalkApp', [
         templateUrl: 'views/main.html',
         controller: 'MainCtrl'
       })
+      .when('/new_user', {
+        templateUrl: 'views/new_user.html',
+        controller: 'NewUserCtrl'
+      })
+      .when('/edit_user/:userId', {
+        templateUrl: 'views/edit_user.html',
+        controller: 'EditUserCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
