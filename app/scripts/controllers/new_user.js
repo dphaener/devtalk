@@ -8,6 +8,7 @@ angular.module('devtalkApp')
     $scope.nickName = '';
     $scope.email = '';
     $scope.loading = false;
+    $scope.errormessage = false;
 
     $scope.addUser = function () {
       $scope.loading = true;
@@ -35,7 +36,11 @@ angular.module('devtalkApp')
           $scope.loading = false;
           alert('New user succesfully added!');
           $location.path('/');
+        }).error(function (data, status, headers, config) {
+          $scope.loading = false;
+          $scope.errormessage = true;
+          $scope.error_message = status;
         })
-      }
-    } 
+      } 
+    }
   });

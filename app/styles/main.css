@@ -29,24 +29,22 @@ h1 {
 }
 
 .loading {
-    width: 64px;
-    height: 64px;
+    width: 37px;
+    height: 37px;
     border-radius: 5px;
     position: absolute;
-    left:45%;
-    top: 45%;
+    left:48%;
+    top: 47%;
 
-    background: -moz-linear-gradient(top,  rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.8) 100%); /* FF3.6+ */
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(0,0,0,0.8)), color-stop(100%,rgba(0,0,0,0.8))); /* Chrome,Safari4+ */
-    background: -webkit-linear-gradient(top,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* Chrome10+,Safari5.1+ */
-    background: -o-linear-gradient(top,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* Opera 11.10+ */
-    background: -ms-linear-gradient(top,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* IE10+ */
-    background: linear-gradient(to bottom,  rgba(0,0,0,0.8) 0%,rgba(0,0,0,0.8) 100%); /* W3C */
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#cc000000', endColorstr='#cc000000',GradientType=0 ); /* IE6-9 */
+    background: #000000;
 }
 
 .loader {
     position: absolute;
-    left: 7px;
-    top: 7px;
+    left: 2px;
+    top: 2px;
+}
+
+.error-message {
+    clear: both;
 }

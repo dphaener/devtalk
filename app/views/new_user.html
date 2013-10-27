@@ -1,5 +1,6 @@
-<div class="container jumbotron">
+<div class="container hero-unit">
 	<h1>Create a New User</h1>
+	<hr />
 	<form role="form">
 
 		<div class="form-group">
@@ -24,6 +25,7 @@
 
 		<button type="submit" class="btn btn-primary" ng-click="addUser()">Submit</button>
 	</form>
+	<div class="error-message alert alert-danger" ng-show="errormessage">There was an error with your request ({{error_message}}). Please try again.</div>
 
 	<div ng-show="loading" class="loading"><img class="loader" src="../images/loading_transparent.gif"></div>
 

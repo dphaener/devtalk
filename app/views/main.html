@@ -1,5 +1,6 @@
 <div class="hero-unit">
   	<h1>Welcome to devTalk!</h1>
+  	<hr />
   	<div class="col-md-6 pull-left left-col">
 	  	<p>Select a user from below to edit:</p>
 	  	<select ng-model="selectedUser" ng-options="user.id as user.firstName + ' ' + user.lastName for user in users">
@@ -11,5 +12,6 @@
 		<p>Don't see who you're looking for?</p>
 		<a href="/#/new_user" class="btn btn-primary">Add user >></a>
 	</div>
+	<div class="error-message alert alert-danger" ng-show="errormessage">There was an error with your request ({{error_message}}). Please try again.</div>
 	<div ng-show="loading" class="loading"><img class="loader" src="../images/loading_transparent.gif"></div>
 </div>

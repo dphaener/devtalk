@@ -19,6 +19,11 @@ angular.module('devtalkApp')
       $scope.nickName = data[0].nickName;
       $scope.email = data[0].email;
       $scope.loading = false;
+      $scope.errormessage = false;
+    }).error(function (data, status, headers, config) {
+      $scope.loading = false;
+      $scope.errormessage = true;
+      $scope.error_message = status;
     });
 
     $scope.saveUser = function () {
@@ -47,7 +52,11 @@ angular.module('devtalkApp')
           $scope.loading = false;
           alert('User data saved!');
           $location.path('/');
-        })
+        }).error(function (data, status, headers, config) {
+          $scope.loading = false;
+          $scope.errormessage = true;
+          $scope.error_message = status;
+        });
       }
     }
 
@@ -62,7 +71,11 @@ angular.module('devtalkApp')
           $scope.loading = false;
           alert('User deleted!');
           $location.path('/');
-        })
+        }).error(function (data, status, headers, config) {
+          $scope.loading = false;
+          $scope.errormessage = true;
+          $scope.error_message = status;
+        });
       }
     }
     
