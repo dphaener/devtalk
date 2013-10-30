@@ -30,7 +30,7 @@ angular.module('devtalkApp')
       $scope.error_message = status;
     });
 
-    $scope.editUser = function () {
-        $location.path('/edit_user/' + $scope.selectedUser);
+    $scope.gotoProjects = function () {
+        $location.path('/project/' + $scope.selectedUser);
     }
   });

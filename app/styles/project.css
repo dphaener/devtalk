@@ -1,0 +1,31 @@
+.message-pane {
+	height: 88%;
+	border-radius: 6px;
+	border: solid white 1px;
+	overflow: hidden;
+}
+
+.project-pane, .users-pane {
+	height: 43%;
+	margin-left: 5px;
+	border-radius: 6px;
+	border: solid white 1px;
+	overflow: hidden;
+}
+
+.project-pane {
+	margin-bottom: 3%;
+}
+
+.right-pane {
+	height: 100%;
+}
+
+.project-cont {
+	height: 100%;
+	padding: 20px 0 20px 0;
+}
+
+.bottom-buttons {
+	margin: 5px;
+}

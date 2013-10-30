@@ -1,32 +1,5 @@
-<div class="container hero-unit">
+<div class="container hero-unit2">
 	<h1>Create a New User</h1>
 	<hr />
-	<form role="form">
-
-		<div class="form-group">
-			<label for="first-name">First Name</label>
-			<input type="text" id="first-name" class="form-control" ng-model="firstName" placeholder="Enter first name">
-		</div>
-
-		<div class="form-group">
-			<label for="last-name">Last Name</label>
-			<input type="text" id="last-name" class="form-control" placeholder="Enter last name" ng-model="lastName">
-		</div>
-
-		<div class="form-group">
-			<label for="nick-name">Nick Name</label>
-			<input type="text" id="nick-name" class="form-control" placeholder="Enter nick name" ng-model="nickName">
-		</div>
-
-		<div class="form-group">
-			<label for="e-mail">Email</label>
-			<input type="email" id="e-mail" class="form-control" placeholder="Enter email address" ng-model="email">
-		</div>
-
-		<button type="submit" class="btn btn-primary" ng-click="addUser()">Submit</button>
-	</form>
-	<div class="error-message alert alert-danger" ng-show="errormessage">There was an error with your request ({{error_message}}). Please try again.</div>
-
-	<div ng-show="loading" class="loading"><img class="loader" src="../images/loading_transparent.gif"></div>
-
+	<div userform></div>
 </div>

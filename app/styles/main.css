@@ -2,19 +2,39 @@
 
 body {
     background: black;
-    
+    height: 100%;
     color: white;
+}
+
+html {
+    height: 100%;
+}
+
+.cont {
+    height: 100%;
 }
 
 .hero-unit {
     margin: 50px auto 0 auto;
-    width: 600px;
+    width: 700px;
     font-size: 18px;
     font-weight: 200;
     line-height: 30px;
     background-color: rgba(30, 31, 46, 0.96);
     border-radius: 6px;
     padding: 60px;
+    overflow: hidden;
+}
+
+.hero-unit2 {
+    margin: 50px auto 0 auto;
+    width: 800px;
+    font-size: 18px;
+    font-weight: 200;
+    line-height: 30px;
+    background-color: rgba(30, 31, 46, 0.96);
+    border-radius: 6px;
+    padding: 40px;
     overflow: hidden;
 }
 
@@ -47,4 +67,9 @@ h1 {
 
 .error-message {
     clear: both;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
 }

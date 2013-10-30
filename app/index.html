@@ -12,9 +12,10 @@
     <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
 
         <!-- build:css(.tmp) styles/main.css -->
-        <link rel="stylesheet" href="styles/bootstrap.css">
+        <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootswatch/3.0.0/slate/bootstrap.min.css">
         <link rel="stylesheet" href="styles/main.css">
         <link rel="stylesheet" href="styles/new_user.css">
+        <link rel="stylesheet" href="styles/project.css">
         <!-- endbuild -->
 </head>
   <body ng-app="devtalkApp">
@@ -28,7 +29,7 @@
     <![endif]-->
 
     <!-- Add your site or application content here -->
-    <div class="container" ng-view=""></div>
+    <div class="cont" ng-view=""></div>
 
     <!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
      <script>
@@ -71,6 +72,9 @@
         <script src="scripts/controllers/main.js"></script>
         <script src="scripts/controllers/new_user.js"></script>
         <script src="scripts/controllers/edit_user.js"></script>
+        <script src="scripts/directives/user_form.js"></script>
+        <script src="scripts/directives/navibar.js"></script>
+        <script src="scripts/controllers/project.js"></script>
         <!-- endbuild -->
 </body>
 </html>

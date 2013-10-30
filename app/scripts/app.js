@@ -19,7 +19,12 @@ angular.module('devtalkApp', [
         templateUrl: 'views/edit_user.html',
         controller: 'EditUserCtrl'
       })
+      .when('/project/:userId', {
+        templateUrl: 'views/project.html',
+        controller: 'ProjectCtrl'
+      })
       .otherwise({
         redirectTo: '/'
       });
   });
+
