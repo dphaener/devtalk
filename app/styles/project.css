@@ -36,12 +36,50 @@
 }
 
 .user-list {
-	list-style-type: none;
 	font-size: 14px;
-	margin-left: -15px;
+}
+
+.project-list {
+	font-size: 14px;
 }
 
 .no-project {
 	margin-top: 35%;
 	padding-left: 10px;
+}
+
+.modal-dialog {
+	width: 800px;
+}
+
+.project-user {
+	border-radius: 4px;
+	margin-left: 10px;
+	margin-top: 10px;
+	padding: 5px 10px;
+}
+
+.project-users {
+	overflow: hidden;
+}
+
+.shown {
+	display: inline-block;
+}
+
+.hidden {
+	display: none;
+}
+
+.user-alert {
+	margin-top: 15px;
+}
+
+.proj-error {
+	padding: 8px 10px;
+	font-size: 14px;
+}
+
+.project-button:hover {
+	cursor: pointer;
 }

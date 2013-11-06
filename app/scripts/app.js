@@ -4,7 +4,7 @@ angular.module('devtalkApp', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
-  'ui.bootstrap'
+  'ui.bootstrap',
 ])
   .config(function ($routeProvider) {
     $routeProvider

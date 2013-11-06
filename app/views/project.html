@@ -1,73 +1,110 @@
 <div nav-bar></div>
 <div class="project-cont container">
 	<div class="message-pane jumbotron pull-left col-md-10">
-		
+		<div ng-show="!projectSelected">
+			<h1>Select a project!</h1>
+		</div>
+		<div ng-show="projectSelected">
+			<h2>{{projectTitle}}&nbsp;&nbsp;<a class="project-button"><i class="glyphicon glyphicon-edit"></i></a></h2>
+			<h3>{{projectDescription}}</h3>
+			<p>{{projectStatus}}</p>
+			<p>{{dueDate | date}}</p>
+		</div>
 	</div>
 	<div class="right-pane col-md-2">
 		<div class="project-pane jumbotron col-md-12">
-			<ul ng-show="!isEmpty" class="project-list">
-				<li ng-repeat="project in projects">{{project.name}}</li>
+			<ul ng-show="!isEmpty" class="project-list list-group">
+				<li class="list-group-item" ng-repeat="project in projects"><a class="project-button" ng-click="openProject(project)">{{project.title}}</a></li>
 			</ul>
+
+			<button class="btn btn-primary" ng-show="!isEmpty" ng-click="open()">Add Project</button>
+
 			<div ng-show="isEmpty" class="no-project">
 				<p>No Projects!</p>
-				<button class="btn btn-primary" open-dialog>Add Project</button>
+				<button class="btn btn-primary" ng-click="open()">Add Project</button>
 			</div>
 		</div>
 		<div class="users-pane jumbotron col-md-12">
-			<ul class="user-list">
-				<li ng-repeat="user in users">{{user.firstName}} {{user.lastName}}</li>
+			<ul class="user-list list-group">
+				<li class="list-group-item" ng-repeat="user in projectTeam">
+					{{user.firstName}} {{user.lastName}}
+				</li>
 			</ul>
 		</div>
 	</div>
 </div>
 
+<script type="text/ng-template" id="newProjectModal.html">
+	
+	<div class="modal-header">
+		<h2>Add New Project</h2>
+	</div>
+	<div class="modal-body">
+		<form class="form-horizontal" role="form" name="form" novalidate>
 
-<div id="projectModal" title="Add New Project" project-new>
-	<form class="form-horizontal" role="form" name="form" novalidate>
-
-		<div class="form-group">
-			<label for="title" class="col-md-3 control-label">Project Name</label>
-			<div class="col-md-6">
-				<input type="text" id="title" class="form-control" name="pTitle" ng-model="projectTitle" placeholder="Enter project name" required>
+			<div class="form-group">
+				<label for="title" class="col-md-3 control-label">Project Name</label>
+				<div class="col-md-6">
+					<input type="text" id="title" class="form-control" name="pTitle" ng-model="projectTitle" placeholder="Enter project name" required>
+				</div>
+				<span class="alert alert-danger col-md-3 proj-error" ng-show="form.pTitle.$error.required">  Project name is required </span>
 			</div>
-			<span class="error col-md-3" ng-show="form.pTitle.$error.required">  *Project name is required </span>
-		</div>
 
-		<div class="form-group">
-			<label for="description" class="col-md-3 control-label">Project Description</label>
-			<div class="col-md-6">
-				<textarea id="description" class="form-control" rows="2" name="pDesc" placeholder="Enter description" ng-model="projectDescription" required></textarea>
+			<div class="form-group">
+				<label for="description" class="col-md-3 control-label">Project Description</label>
+				<div class="col-md-6">
+					<textarea id="description" class="form-control" rows="2" name="pDesc" placeholder="Enter description" ng-model="projectDesc" required></textarea>
+				</div>
+				<span class="col-md-3 alert alert-danger proj-error" ng-show="form.pDesc.$error.required">  Description is required </span>
 			</div>
-			<span class="error col-md-3" ng-show="form.pDesc.$error.required">  *Description is required </span>
-		</div>
 
-		<div class="form-group">
-			<label for="status" class="col-md-3 control-label">Project status</label>
-			<div class="col-md-6">
-				<select id="status" class="form-control" ng-model="projectStatus">
-					<option ng-repeat="item in statusItems">{{item}}</option>
-				</select>
+			<div class="form-group">
+				<label for="status" class="col-md-3 control-label">Project Status</label>
+				<div class="col-md-6">
+					<select id="status" class="form-control" ng-model="selectedItem" ng-options="item for item in items" required>
+					</select>
+				</div>
 			</div>
-		</div>
 
-		<div class="form-group">
-			<label for="team" class="col-md-3 control-label">Select Users</label>
-			<div class="col-md-6">
-				<select type="email" id="team" class="form-control" ng-model="selectedUser" required>
-					<option ng-repeat="user in users">{{user.firstName}} {{user.lastName}}</option>
-				</select>
+			<div class="form-group">
+				<label for="dueDate" class="col-md-3 control-label">Due Date</label>
+				<div class="col-md-6">
+			        <input type="text" class="form-control" name="pDate" datepicker-popup="dd-MMMM-yyyy" ng-model="dt" is-open="opened" min="minDate" max="'2015-06-22'" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" />
+				</div>
+				<span class="col-md-3 alert alert-danger proj-error" ng-show="form.pDate.$error.required">  Due date is required </span>
 			</div>
-			<button class="col-md-2 btn btn-primary" select-user>Add User</button>
-		</div>
 
-		<div>
-			<ul>
-				<li ng-repeat="user in projectUsers">{{user}}</li>
-			</ul>
-		</div>
+			<div class="form-group">
+				<label for="team" class="col-md-3 control-label">Select Devs</label>
+				<div class="col-md-6">
+					<select type="email" id="team" class="form-control" ng-model="selectedUser" ng-options="user as user.firstName + ' ' + user.lastName for user in users">
+					</select>
+				</div>
+				<button class="col-md-2 btn btn-primary" ng-click="addUser(selectedUser)">Add Dev</button>
+			</div>
+			<hr />
+			<div class="project-users">
+				<h3>Project Devs</h3>
 
-		<div class="col-md-1"></div>
-		<button class="btn btn-primary col-md-2 bottom-buttons pull-right" close-dialog>Cancel</button>
-		<button class="btn btn-primary col-md-2 bottom-buttons pull-right" save-project>Save</button>
-	</form> 
-</div>
+				<div id="userWarning" class="shown user-alert">
+					<span class="alert alert-danger proj-error">You must have at least one developer in the project!!!</span>
+				</div>
+
+				<ul class="list-group">
+					<li class="list-group-item col-md-3 project-user" ng-repeat="user in projectUsers">
+						{{user.firstName}} {{user.lastName}}
+						<button type="button" class="close" aria-hidden="true" ng-click="removeUser(user)">&times;</button>
+					</li>
+				</ul>
+			</div>
+
+			<div class="col-md-1"></div>
+			
+		</form> 
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="cancel()">Cancel</button>
+		<button id="saveProject" class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="ok(projectTitle, projectDesc)" disabled="disabled">Save</button>
+	</div>
+</script>
+

@@ -1386,31 +1386,21 @@ angular.module('ui.bootstrap.modal', [])
 /**
  * A helper directive for the $modal service. It creates a backdrop element.
  */
-  .directive('modalBackdrop', ['$modalStack', '$timeout', function ($modalStack, $timeout) {
+  .directive('modalBackdrop', ['$timeout', function ($timeout) {
     return {
       restrict: 'EA',
       replace: true,
       templateUrl: 'template/modal/backdrop.html',
       link: function (scope, element, attrs) {
-
         //trigger CSS transitions
         $timeout(function () {
           scope.animate = true;
         });
-
-        scope.close = function (evt) {
-          var modal = $modalStack.getTop();
-          if (modal && modal.value.backdrop && modal.value.backdrop != 'static') {
-            evt.preventDefault();
-            evt.stopPropagation();
-            $modalStack.dismiss(modal.key, 'backdrop click');
-          }
-        };
       }
     };
   }])
 
-  .directive('modalWindow', ['$timeout', function ($timeout) {
+  .directive('modalWindow', ['$modalStack', '$timeout', function ($modalStack, $timeout) {
     return {
       restrict: 'EA',
       scope: {
@@ -1426,6 +1416,15 @@ angular.module('ui.bootstrap.modal', [])
         $timeout(function () {
           scope.animate = true;
         });
+
+        scope.close = function (evt) {
+          var modal = $modalStack.getTop();
+          if (modal && modal.value.backdrop && modal.value.backdrop != 'static' && (evt.target === evt.currentTarget)) {
+            evt.preventDefault();
+            evt.stopPropagation();
+            $modalStack.dismiss(modal.key, 'backdrop click');
+          }
+        };
       }
     };
   }])
@@ -1449,6 +1448,10 @@ angular.module('ui.bootstrap.modal', [])
         }
         return topBackdropIndex;
       }
+
+      $rootScope.$watch(openedWindows.length, function(noOfModals){
+        body.toggleClass('modal-open', openedWindows.length() > 0);
+      });
 
       $rootScope.$watch(backdropIndex, function(newBackdropIndex){
         backdropScope.index = newBackdropIndex;
@@ -1489,6 +1492,7 @@ angular.module('ui.bootstrap.modal', [])
 
       $modalStack.open = function (modalInstance, modal) {
 
+        // @TODO: Why not  pass `modal` as the second argument?
         openedWindows.add(modalInstance, {
           deferred: modal.deferred,
           modalScope: modal.scope,
@@ -1505,6 +1509,8 @@ angular.module('ui.bootstrap.modal', [])
         openedWindows.top().value.modalDomEl = modalDomEl;
         body.append(modalDomEl);
 
+        backdropScope.modal = modal;
+
         if (backdropIndex() >= 0 && !backdropDomEl) {
             backdropjqLiteEl = angular.element('<div modal-backdrop></div>');
             backdropDomEl = $compile(backdropjqLiteEl)(backdropScope);
@@ -1513,9 +1519,9 @@ angular.module('ui.bootstrap.modal', [])
       };
 
       $modalStack.close = function (modalInstance, result) {
-        var modal = openedWindows.get(modalInstance);
-        if (modal) {
-          modal.value.deferred.resolve(result);
+        var modalWindow = openedWindows.get(modalInstance).value;
+        if (modalWindow) {
+          modalWindow.deferred.resolve(result);
           removeModalWindow(modalInstance);
         }
       };
@@ -1537,11 +1543,13 @@ angular.module('ui.bootstrap.modal', [])
 
   .provider('$modal', function () {
 
-    var $modalProvider = {
-      options: {
-        backdrop: true, //can be also false or 'static'
-        keyboard: true
-      },
+    var defaultOptions = {
+      backdrop: true, //can be also false or 'static'
+      keyboard: true
+    };
+
+    return {
+      options: defaultOptions,
       $get: ['$injector', '$rootScope', '$q', '$http', '$templateCache', '$controller', '$modalStack',
         function ($injector, $rootScope, $q, $http, $templateCache, $controller, $modalStack) {
 
@@ -1574,15 +1582,15 @@ angular.module('ui.bootstrap.modal', [])
               result: modalResultDeferred.promise,
               opened: modalOpenedDeferred.promise,
               close: function (result) {
-                $modalStack.close(modalInstance, result);
+                $modalStack.close(this, result);
               },
               dismiss: function (reason) {
-                $modalStack.dismiss(modalInstance, reason);
+                $modalStack.dismiss(this, reason);
               }
             };
 
             //merge and clean up options
-            modalOptions = angular.extend({}, $modalProvider.options, modalOptions);
+            modalOptions = angular.extend({}, defaultOptions, modalOptions);
             modalOptions.resolve = modalOptions.resolve || {};
 
             //verify options
@@ -1596,32 +1604,26 @@ angular.module('ui.bootstrap.modal', [])
 
             templateAndResolvePromise.then(function resolveSuccess(tplAndVars) {
 
-              var modalScope = (modalOptions.scope || $rootScope).$new();
-              modalScope.$close = modalInstance.close;
-              modalScope.$dismiss = modalInstance.dismiss;
+              modalOptions.scope = (modalOptions.scope || $rootScope).$new();
 
-              var ctrlInstance, ctrlLocals = {};
+              var ctrlLocals = {};
               var resolveIter = 1;
 
               //controllers
               if (modalOptions.controller) {
-                ctrlLocals.$scope = modalScope;
+                ctrlLocals.$scope = modalOptions.scope;
                 ctrlLocals.$modalInstance = modalInstance;
                 angular.forEach(modalOptions.resolve, function (value, key) {
                   ctrlLocals[key] = tplAndVars[resolveIter++];
                 });
 
-                ctrlInstance = $controller(modalOptions.controller, ctrlLocals);
+                modalOptions.controller = $controller(modalOptions.controller, ctrlLocals);
               }
 
-              $modalStack.open(modalInstance, {
-                scope: modalScope,
-                deferred: modalResultDeferred,
-                content: tplAndVars[0],
-                backdrop: modalOptions.backdrop,
-                keyboard: modalOptions.keyboard,
-                windowClass: modalOptions.windowClass
-              });
+              modalOptions.deferred = modalResultDeferred;
+              modalOptions.content = tplAndVars[0];
+
+              $modalStack.open(modalInstance, modalOptions);
 
             }, function resolveError(reason) {
               modalResultDeferred.reject(reason);
@@ -1639,8 +1641,6 @@ angular.module('ui.bootstrap.modal', [])
           return $modal;
         }]
     };
-
-    return $modalProvider;
   });
 angular.module('ui.bootstrap.pagination', [])
 
@@ -3360,9 +3360,9 @@ angular.module("template/datepicker/datepicker.html", []).run(["$templateCache",
     "<table>\n" +
     "  <thead>\n" +
     "    <tr class=\"text-center\">\n" +
-    "      <th><button type=\"button\" class=\"btn pull-left\" ng-click=\"move(-1)\"><i class=\"icon-chevron-left\"></i></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn pull-left\" ng-click=\"move(-1)\"><i class=\"glyphicon glyphicon-chevron-left\"></i></button></th>\n" +
     "      <th colspan=\"{{rows[0].length - 2 + showWeekNumbers}}\"><button type=\"button\" class=\"btn btn-block\" ng-click=\"toggleMode()\"><strong>{{title}}</strong></button></th>\n" +
-    "      <th><button type=\"button\" class=\"btn pull-right\" ng-click=\"move(1)\"><i class=\"icon-chevron-right\"></i></button></th>\n" +
+    "      <th><button type=\"button\" class=\"btn pull-right\" ng-click=\"move(1)\"><i class=\"glyphicon glyphicon-chevron-right\"></i></button></th>\n" +
     "    </tr>\n" +
     "    <tr class=\"text-center\" ng-show=\"labels.length > 0\">\n" +
     "      <th ng-show=\"showWeekNumbers\">#</th>\n" +
@@ -3399,12 +3399,16 @@ angular.module("template/datepicker/popup.html", []).run(["$templateCache", func
 
 angular.module("template/modal/backdrop.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/modal/backdrop.html",
-    "<div class=\"modal-backdrop fade\" ng-class=\"{in: animate}\" ng-style=\"{'z-index': 1040 + index*10}\" ng-click=\"close($event)\"></div>");
+    "<div class=\"modal-backdrop fade {{modal.backdropClass}}\" ng-class=\"{in: animate}\" ng-style=\"{'z-index': 1040 + index*10}\"></div>");
 }]);
 
 angular.module("template/modal/window.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("template/modal/window.html",
-    "<div class=\"modal fade {{ windowClass }}\" ng-class=\"{in: animate}\" ng-style=\"{'z-index': 1050 + index*10}\" ng-transclude></div>");
+    "<div class=\"modal fade {{ windowClass }}\" ng-class=\"{in: animate}\" ng-style=\"{'z-index': 1050 + index*10, display: 'block'}\" ng-click=\"close($event)\">" +
+    "    <div class=\"modal-dialog\">" +
+    "        <div class=\"modal-content\" ng-transclude></div>" +
+    "   </div>" +
+    "</div>");
 }]);
 
 angular.module("template/pagination/pager.html", []).run(["$templateCache", function($templateCache) {
