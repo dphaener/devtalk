@@ -79,36 +79,35 @@ angular.module('devtalkApp')
 		    	$http({
 			    	method: 'POST',
 			    	url: 'http://geekwise-angularjs.herokuapp.com/darin/projects',
-			    	// data: {
-			    	// 	title: project.title,
-			    	// 	description: project.description,
-			    	// 	status: project.status,
-			    	// 	dueDate: project.dueDate,
-			    	// 	team: project.team
-			    	// }
 			    	data : project
 				    }).success(function (data, status, headers, config) {
-				    	alert('Success!');
-				    }).error(function (data, status, headers, config) {
-				     console.log(data);
-				    });
+				    	$http({
+                method: 'GET',
+                url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
+                }).success(function (data, status, headers, config) {
+                  $scope.projects = data;
+                  $scope.isEmpty = false;
+                  $scope.projectTitle = project.title;
+                  $scope.projectDescription = project.description;
+                  $scope.projectStatus = project.status;
+                  $scope.dueDate = project.dueDate;
+                  $scope.projectSelected = true;
+                  $scope.projectTeam = [];
+                  var i;
+                  var j;
 
-				  $http({
-			    	method: 'GET',
-			    	url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
-				    }).success(function (data, status, headers, config) {
-				    	$scope.projects = data;
-				    	$scope.isEmpty = false;
-				    }).error(function (data, status, headers, config) {
-				      
-				    });
+                  for (i = 0; i < project.team.length; i++) {
+                    for (j = 0; j < $scope.users.length; j++) {
+                      if (project.team[i] === $scope.users[j].id) {$scope.projectTeam.push($scope.users[j]);} 
+                    };
+                  };
 
-	      	$scope.projectTitle = project.title;
-	      	$scope.projectDescription = project.description;
-	      	$scope.projectStatus = project.status;
-	      	$scope.projectTeam = project.team;
-	      	$scope.dueDate = project.dueDate;
-          $scope.projectSelected = true;
+                }).error(function (data, status, headers, config) {
+                  
+                });
+				    }).error(function (data, status, headers, config) {
+
+				    });
 		    });
 		  };
   })

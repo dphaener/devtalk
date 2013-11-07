@@ -83,3 +83,7 @@
 .project-button:hover {
 	cursor: pointer;
 }
+
+.pane-list {
+	padding: 5px 10px;
+}
