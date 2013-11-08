@@ -1,36 +1,38 @@
 <div>
 	<nav class="navbar navbar-default" role="navigation">
-  <!-- Brand and toggle get grouped for better mobile display -->
-  <div class="navbar-header">
-    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-      <span class="sr-only">Toggle navigation</span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-      <span class="icon-bar"></span>
-    </button>
-    <a class="navbar-brand" href="#">devTalk</a>
-  </div>
+	  <!-- Brand and toggle get grouped for better mobile display -->
+	  <div class="navbar-header">
+	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+	      <span class="sr-only">Toggle navigation</span>
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	      <span class="icon-bar"></span>
+	    </button>
+	    <a class="navbar-brand" href="#">devTalk</a>
+	    <p class="navbar-text">Signed in as {{currentUser.firstName}} {{currentUser.lastName}}</p>
+	  </div>
 
-  <!-- Collect the nav links, forms, and other content for toggling -->
-  <div class="collapse navbar-collapse navbar-ex1-collapse">
-    <ul class="nav navbar-nav">
-      <li><a ng-click="open()" class="project-button">New Project</a></li>
-    </ul>
-    <ul class="nav navbar-nav navbar-right">
-      <li><a href="#">Log Out</a></li>
-      <!-- <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-          <li><a href="#">Action</a></li>
-          <li><a href="#">Another action</a></li>
-          <li><a href="#">Something else here</a></li>
-          <li><a href="#">Separated link</a></li>
-        </ul>
-      </li> -->
-    </ul>
-  </div><!-- /.navbar-collapse -->
-</nav>
+	  <!-- Collect the nav links, forms, and other content for toggling -->
+	  <div class="collapse navbar-collapse navbar-ex1-collapse">
+	    <ul class="nav navbar-nav">
+	      <li><a ng-click="open()" class="project-button">New Project</a></li>
+	    </ul>
+	    <ul class="nav navbar-nav navbar-right">
+	      <li><a href="#">Log Out</a></li>
+	      <!-- <li class="dropdown">
+	        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
+	        <ul class="dropdown-menu">
+	          <li><a href="#">Action</a></li>
+	          <li><a href="#">Another action</a></li>
+	          <li><a href="#">Something else here</a></li>
+	          <li><a href="#">Separated link</a></li>
+	        </ul>
+	      </li> -->
+	    </ul>
+	  </div><!-- /.navbar-collapse -->
+	</nav>
 </div>
+
 <div class="project-cont container">
 	<div class="message-pane jumbotron pull-left col-md-10">
 		<div ng-show="!projectSelected">
@@ -45,8 +47,11 @@
 			</div>
 			<div class="project-conv">
 				<ul>
-					<li ng-repeat="conv in project"></li>
+					<li ng-repeat="conv in project.conversations"></li>
 				</ul>
+			</div>
+			<div class="">
+				<button class="btn btn-primary" ng-click="convOpen()">New Conversation</button> 
 			</div>
 		</div>
 	</div>
@@ -147,3 +152,29 @@
 	</div>
 </script>
 
+<script type="text/ng-template" id="newConversationModal.html">
+
+	<div class="modal-header">
+		<h3>New Conversation</h3>
+	</div>
+
+	<div class="modal-body">
+		<form class="form-horizontal" role="form" name="form" novalidate>
+
+			<div class="form-group">
+				<label for="subject" class="col-md-3 control-label">Subject</label>
+				<div class="col-md-6">
+					<input type="text" id="subject" class="form-control" name="cSubject" ng-model="conversationSubject" placeholder="Enter conversation subject" required>
+				</div>
+				<span class="alert alert-danger col-md-3 proj-error" ng-show="form.cSubject.$error.required">  Conversation subject is required </span>
+			</div>
+
+		</form>
+	</div>
+
+	<div class="modal-footer">
+		<button class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="cancel()">Cancel</button>
+		<button id="saveProject" class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="ok(conversationSubject)">Save</button>
+	</div>
+
+</script>
