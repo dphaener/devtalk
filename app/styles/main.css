@@ -77,3 +77,11 @@ h1 {
     font-size: 14px;
     padding: 3px 10px;
 }
+
+.muted {
+    color: gray;
+}
+
+.btn-muted {
+    background-color: #9FA1A2;
+}

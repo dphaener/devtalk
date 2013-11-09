@@ -3307,18 +3307,23 @@ angular.module('ui.bootstrap.typeahead', ['ui.bootstrap.position', 'ui.bootstrap
       return query ? matchItem.replace(new RegExp(escapeRegexp(query), 'gi'), '<strong>$&</strong>') : matchItem;
     };
   });
-angular.module("template/accordion/accordion-group.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("template/accordion/accordion-group.html",
-    "<div class=\"accordion-group\">\n" +
-    "  <div class=\"accordion-heading\" ><a class=\"accordion-toggle\" ng-click=\"isOpen = !isOpen\" accordion-transclude=\"heading\">{{heading}}</a></div>\n" +
-    "  <div class=\"accordion-body\" collapse=\"!isOpen\">\n" +
-    "    <div class=\"accordion-inner\" ng-transclude></div>  </div>\n" +
-    "</div>");
+angular.module("template/accordion/accordion-group.html", []).run(["$templateCache", function ($templateCache) {
+    $templateCache.put("template/accordion/accordion-group.html",
+      "<div class=\"panel panel-default\">" +
+      "  <div class=\"panel-heading\">" +
+      "    <h4 class=\"panel-title\">" +
+      "      <a href=\"\" class=\"accordion-toggle\" ng-click=\"isOpen = !isOpen\" accordion-transclude=\"heading\">{{heading}}</a>" +
+      "    </h4>" +
+      "  </div>" +
+      "  <div class=\"panel-collapse collapse in\" collapse=\"!isOpen\">" +
+      "    <div class=\"panel-body\" ng-transclude></div>" +
+      "  </div>" +
+      "</div>");
 }]);
-
-angular.module("template/accordion/accordion.html", []).run(["$templateCache", function($templateCache) {
-  $templateCache.put("template/accordion/accordion.html",
-    "<div class=\"accordion\" ng-transclude></div>");
+ 
+angular.module("template/accordion/accordion.html", []).run(["$templateCache", function ($templateCache) {
+    $templateCache.put("template/accordion/accordion.html",
+      "<div class=\"panel-group\" ng-transclude></div>");
 }]);
 
 angular.module("template/alert/alert.html", []).run(["$templateCache", function($templateCache) {
@@ -3373,7 +3378,7 @@ angular.module("template/datepicker/datepicker.html", []).run(["$templateCache",
     "    <tr ng-repeat=\"row in rows\">\n" +
     "      <td ng-show=\"showWeekNumbers\" class=\"text-center\"><em>{{ getWeekNumber(row) }}</em></td>\n" +
     "      <td ng-repeat=\"dt in row\" class=\"text-center\">\n" +
-    "        <button type=\"button\" style=\"width:100%;\" class=\"btn\" ng-class=\"{'btn-info': dt.selected}\" ng-click=\"select(dt.date)\" ng-disabled=\"dt.disabled\"><span ng-class=\"{muted: dt.secondary}\">{{dt.label}}</span></button>\n" +
+    "        <button type=\"button\" style=\"width:100%;\" class=\"btn\" ng-class=\"{'btn-info': dt.selected, 'btn-muted': dt.secondary}\" ng-click=\"select(dt.date)\" ng-disabled=\"dt.disabled\"><span ng-class=\"{muted: dt.secondary}\">{{dt.label}}</span></button>\n" +
     "      </td>\n" +
     "    </tr>\n" +
     "  </tbody>\n" +
@@ -3387,11 +3392,6 @@ angular.module("template/datepicker/popup.html", []).run(["$templateCache", func
     " <li ng-transclude></li>\n" +
     " <li class=\"divider\"></li>\n" +
     " <li style=\"padding: 9px;\">\n" +
-    "   <span class=\"btn-group\">\n" +
-    "     <button class=\"btn btn-small btn-inverse\" ng-click=\"today()\">Today</button>\n" +
-    "     <button class=\"btn btn-small btn-info\" ng-click=\"showWeeks = ! showWeeks\" ng-class=\"{active: showWeeks}\">Weeks</button>\n" +
-    "     <button class=\"btn btn-small btn-danger\" ng-click=\"clear()\">Clear</button>\n" +
-    "   </span>\n" +
     "   <button class=\"btn btn-small btn-success pull-right\" ng-click=\"isOpen = false\">Close</button>\n" +
     " </li>\n" +
     "</ul>");

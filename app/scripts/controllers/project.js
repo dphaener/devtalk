@@ -3,46 +3,34 @@ angular.module('devtalkApp')
   		$scope.users = [];
   		$scope.isEmpty = true;
   		$scope.projectSelected = false;
-  		$scope.statusItems = [
-  			'New',
-  			'In progress',
-  			'Completed'
-  		];
-  		$scope.projectTitle = '';
-  		$scope.projectDescription = '';
-  		$scope.projectStatus = '';
-  		$scope.projectTeam = [];
-  		$scope.dueDate = '';
-      $scope.projectId = '';
+      $scope.pLoading = true;
+      $scope.uLoading = true;
+      $scope.newConversation = false;
+      $scope.isNewMessage = false;
 
-      $scope.projectUsers = [];
+      $scope.currentProject = [];
+
+      // Initialize User list
 
   		$http({
 	    	method: 'GET',
 	    	url: 'http://geekwise-angularjs.herokuapp.com/darin/users'
 		    }).success(function (data, status, headers, config) {
 		    	var i;
-		    	for (i = 0; i < data.length; i++) {
-		    		$scope.users.push({
-  	          firstName: data[i].firstName,
-  	          lastName: data[i].lastName,
-  	          nickName: data[i].nickName,
-  	          email: data[i].email,
-  	          id: data[i]._id
-		       	});
-		    	}
+		    	$scope.users = data;
           for (i = 0; i < $scope.users.length; i++) {
-            if ($scope.users[i].id === $routeParams.userId) {
+            if ($scope.users[i]._id === $routeParams.userId) {
               $scope.currentUser = $scope.users[i];
             };
           };
-		      $scope.selectedUser = $scope.users[0].id;
-		      $scope.loading = false;
+		      $scope.uLoading = false;
 		    }).error(function (data, status, headers, config) {
-		      $scope.loading = false;
+		      $scope.uLoading = false;
 		      $scope.errormessage = true;
 		      $scope.error_message = status;
 		    });
+
+      // Initialize project list
 
 		  $http({
 			    	method: 'GET',
@@ -50,123 +38,48 @@ angular.module('devtalkApp')
 				    }).success(function (data, status, headers, config) {
 				    	$scope.projects = data;
 				    	$scope.isEmpty = false;
+              $scope.pLoading = false;
 				    }).error(function (data, status, headers, config) {
 				      
 				    });
 
+      // Open selected project
+
 			$scope.openProject = function(project) {
-				$scope.projectTitle = project.title;
-				$scope.projectDescription = project.description;
-				$scope.projectStatus = project.status;
-				$scope.projectTeam = project.team;
-  			$scope.dueDate = project.dueDate;
+        $scope.currentProject = project;
         $scope.projectSelected = true;
-        $scope.projectId = project._id;
-        console.log(project._id);
-			}
+        $scope.newConversation = false;
+        $scope.isNewMessage = false;
+			};
+      
+      // Save the new message
 
-	    $scope.open = function () {
-
-		    var modalInstance = $modal.open({
-		      templateUrl: 'newProjectModal.html',
-		      controller: ModalInstanceCtrl,
-		      backdrop: 'static',
-		      windowClass: 'new-project',
-		      resolve: {
-		        items: function () {
-		          return $scope.statusItems;
-		        },
-		        users: function () {
-		        	return $scope.users;
-		        }
-		      }
-		    });
-
-		    modalInstance.result.then(function (project) {
-		    	$http({
-			    	method: 'POST',
-			    	url: 'http://geekwise-angularjs.herokuapp.com/darin/projects',
-			    	data : project
-				    }).success(function (data, status, headers, config) {
-              $http({
-                method: 'GET',
-                url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
-                }).success(function (data, status, headers, config) {
-                  $scope.projects = data;
-                  $scope.isEmpty = false;
-                  $scope.projectTitle = project.title;
-                  $scope.projectDescription = project.description;
-                  $scope.projectStatus = project.status;
-                  $scope.dueDate = project.dueDate;
-                  $scope.projectSelected = true;
-                  $scope.projectId = $scope.projects[$scope.projects.length - 1]._id;
-                  console.log($scope.projectId);
-                  $scope.projectTeam = [];
-                  var i;
-                  var j;
-
-                  for (i = 0; i < project.team.length; i++) {
-                    for (j = 0; j < $scope.users.length; j++) {
-                      if (project.team[i] === $scope.users[j].id) {$scope.projectTeam.push($scope.users[j]);} 
-                    };
-                  };
-
-                }).error(function (data, status, headers, config) {
-                  
-                });
-				    }).error(function (data, status, headers, config) {
-
-				    });
-		    });
-		  };
-
-      $scope.convOpen = function () {
-
-        var modalInstance = $modal.open({
-          templateUrl: 'newConversationModal.html',
-          controller: convModalInstanceCtrl,
-          backdrop: 'static',
-          resolve: {
-            // items: function () {
-            //   return $scope.statusItems;
-            // },
-            // users: function () {
-            //   return $scope.users;
-            // }
-          }
-        });
-
-        modalInstance.result.then(function (conversationSubject) {
-          $http({
+      $scope.saveMessage = function(newMessage, conversation) {
+        $scope.uLoading = true;
+        $http({
             method: 'POST',
-            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/'+$scope.projectId+'/conversations',
-            data: {
-              subject: conversationSubject
+            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/' + $scope.currentProject._id + '/conversations/' + conversation._id + '/messages',
+            data : {
+              message: newMessage,
+              user: $scope.currentUser._id
             }
             }).success(function (data, status, headers, config) {
+              $scope.uLoading = false;
+              $scope.pLoading = true;
+              $scope.newMessage = '';
+              $scope.isNewMessage = false;
               $http({
                 method: 'GET',
                 url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
                 }).success(function (data, status, headers, config) {
+                  $scope.pLoading = false;
                   $scope.projects = data;
                   $scope.isEmpty = false;
                   var i;
                   for (i = 0; i < $scope.projects.length; i++) {
-                    if ($scope.projectId === $scope.projects[i]._id) {
-                      $scope.projectTitle = $scope.projects[i].title;
-                      $scope.projectDescription = $scope.projects[i].description;
-                      $scope.projectStatus = $scope.projects[i].status;
-                      $scope.dueDate = $scope.projects[i].dueDate;
+                    if ($scope.currentProject._id === $scope.projects[i]._id) {
+                      $scope.currentProject = $scope.projects[i];
                       $scope.projectSelected = true;
-                      $scope.projectTeam = [];
-                      var i;
-                      var j;
-
-                      for (i = 0; i < $scope.projects[i].team.length; i++) {
-                        for (j = 0; j < $scope.users.length; j++) {
-                          if ($scope.projects[i].team[i] === $scope.users[j].id) {$scope.projectTeam.push($scope.users[j]);} 
-                        };
-                      };
                     };
                   };
                 }).error(function (data, status, headers, config) {
@@ -175,22 +88,142 @@ angular.module('devtalkApp')
             }).error(function (data, status, headers, config) {
 
             });
-        });
       };
+
+      // Save the new conversation
+
+      $scope.saveConversation = function (conversationSubject) {
+        $scope.uLoading = true;
+        $http({
+            method: 'POST',
+            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/'+$scope.currentProject._id+'/conversations',
+            data: {
+              subject: conversationSubject
+            }
+            }).success(function (data, status, headers, config) {
+              $scope.newConversation = false;
+              $scope.conversationSubject = '';
+              $scope.pLoading = true;
+              $scope.uLoading = false;
+              $http({
+                method: 'GET',
+                url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
+              }).success(function (data, status, headers, config) {
+                $scope.pLoading = false;
+                $scope.projects = data;
+                $scope.isEmpty = false;
+                var i;
+                for (i = 0; i < $scope.projects.length; i++) {
+                  if ($scope.currentProject._id === $scope.projects[i]._id) {
+                    $scope.currentProject = $scope.projects[i];
+                    $scope.projectSelected = true;
+                  };
+                };
+              }).error(function (data, status, headers, config) {
+                
+              });
+            }).error(function (data, status, headers, config) {
+
+            });
+      };
+
+      // New Project Dialog
+
+	    $scope.open = function () {
+
+		    var modalInstance = $modal.open({
+		      templateUrl: 'views/templates/newProjectModal.html',
+		      controller: ModalInstanceCtrl,
+		      backdrop: 'static',
+		      windowClass: 'new-project',
+		      resolve: {
+		        users: function () {
+		        	return $scope.users;
+		        }
+		      }
+		    });
+
+		    modalInstance.result.then(function (newProject) {
+		    	$http({
+			    	method: 'POST',
+			    	url: 'http://geekwise-angularjs.herokuapp.com/darin/projects',
+			    	data : Project
+				    }).success(function (data, status, headers, config) {
+              $scope.pLoading = true;
+              $http({
+                method: 'GET',
+                url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
+                }).success(function (data, status, headers, config) {
+                  $scope.projects = data;
+                  $scope.isEmpty = false;
+                  $scope.pLoading = false;
+                  $scope.currentProject = newProject;
+                  $scope.projectSelected = true;
+                }).error(function (data, status, headers, config) {
+                  
+                });
+				    }).error(function (data, status, headers, config) {
+
+				    });
+		    });
+		  };
+  })
+  .filter('fromNow', function() {
+    return function(dateString) {
+      return moment(dateString).fromNow()
+    };
   })
 
+// Controller for New Project Dialog
 
-var convModalInstanceCtrl = function ($scope, $modalInstance) {
+var ModalInstanceCtrl = function ($scope, $modalInstance, users) {
 
-  $scope.conversationSubject = '';
+  $scope.dt = new Date();
+  $scope.users = users;
+  $scope.items = ['New', 'In Progess', 'Completed'];
+  $scope.selectedItem = $scope.items[0];
+  $scope.selectedUser = $scope.users[0];
+  $scope.projectUsers = [];
+  $scope.userAbsent = true;
 
-  $scope.ok = function (conversationSubject) {
-    $modalInstance.close(conversationSubject);
+  $scope.ok = function (projectTitle, projectDescription) {
+    newProject = {
+      title: projectTitle,
+      description: projectDescription,
+      status: $scope.selectedItem,
+      dueDate: $scope.dt
+    }
+    $modalInstance.close(newProject);
   };
 
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
   };
 
-};
+  $scope.addUser = function (selectedUser) {
+    var i;
 
+    for (i = 0; i < $scope.projectUsers.length; i++) {
+      if ($scope.projectUsers[i]._id === selectedUser._id) { return; }
+    };
+
+    $scope.projectUsers.push(selectedUser);
+
+    $("#userWarning").css('display', 'none');
+
+    $scope.userAbsent = false;
+  };
+
+  $scope.removeUser = function (user) {
+    var i;
+
+    for (i = 0; i < $scope.projectUsers.length; i++) {
+      if ($scope.projectUsers[i]._id === user._id) { $scope.projectUsers.splice(i, 1); }
+    };
+
+    if ($scope.projectUsers.length === 0) {
+      $('#userWarning').css('display', 'inline-block');
+      $scope.userAbsent = true;
+    };
+  }
+};

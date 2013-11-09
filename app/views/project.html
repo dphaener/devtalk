@@ -1,180 +1,146 @@
-<div>
-	<nav class="navbar navbar-default" role="navigation">
-	  <!-- Brand and toggle get grouped for better mobile display -->
-	  <div class="navbar-header">
-	    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
-	      <span class="sr-only">Toggle navigation</span>
-	      <span class="icon-bar"></span>
-	      <span class="icon-bar"></span>
-	      <span class="icon-bar"></span>
-	    </button>
-	    <a class="navbar-brand" href="#">devTalk</a>
-	    <p class="navbar-text">Signed in as {{currentUser.firstName}} {{currentUser.lastName}}</p>
-	  </div>
+<!-- The good old navigation bar -->
 
-	  <!-- Collect the nav links, forms, and other content for toggling -->
-	  <div class="collapse navbar-collapse navbar-ex1-collapse">
-	    <ul class="nav navbar-nav">
-	      <li><a ng-click="open()" class="project-button">New Project</a></li>
-	    </ul>
-	    <ul class="nav navbar-nav navbar-right">
-	      <li><a href="#">Log Out</a></li>
-	      <!-- <li class="dropdown">
-	        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-	        <ul class="dropdown-menu">
-	          <li><a href="#">Action</a></li>
-	          <li><a href="#">Another action</a></li>
-	          <li><a href="#">Something else here</a></li>
-	          <li><a href="#">Separated link</a></li>
-	        </ul>
-	      </li> -->
-	    </ul>
-	  </div><!-- /.navbar-collapse -->
-	</nav>
-</div>
+<nav class="navbar navbar-default" role="navigation">
+  <div class="navbar-header">
+    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+    <a class="navbar-brand" href="#">devTalk</a>
+    <p class="navbar-text">Signed in as {{currentUser.firstName}} {{currentUser.lastName}}</p>
+  </div>
 
+  <div class="collapse navbar-collapse navbar-ex1-collapse">
+    <ul class="nav navbar-nav">
+      <li><a ng-click="open()" class="project-button">New Project</a></li>
+    </ul>
+    <ul class="nav navbar-nav navbar-right">
+      <li><a href="#">Log Out</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- The container for the rest of the page -->
 <div class="project-cont container">
-	<div class="message-pane jumbotron pull-left col-md-10">
+
+	<!-- The currently selected project, it's conversations and messages live here -->
+
+	<div class="message-pane jumbotron pull-left col-md-9">
+		
+		<!-- Show this if there is no project currently selected -->
+
 		<div ng-show="!projectSelected">
 			<h1>Select a project!</h1>
 		</div>
+
+		<!-- This is shown when a project is selected -->
+
 		<div ng-show="projectSelected">
+
+			<!-- The project title and details -->
+
 			<div class="project-header">
-				<h2>{{projectTitle}}&nbsp;&nbsp;<a class="project-button"><i class="glyphicon glyphicon-edit"></i></a></h2>
-				<h3>Description: {{projectDescription}}</h3>
-				<p>Status: {{projectStatus}}</p>
-				<p>Due Date: {{dueDate | date}}</p>
+				<h1>{{currentProject.title}}</h2>
+				<h3>Description: {{currentProject.description}}</h3>
+				<h4>Due Date: {{currentProject.dueDate | date}}</h4>
+				<h4>Status: {{currentProject.status}}</h4>
 			</div>
-			<div class="project-conv">
-				<ul>
-					<li ng-repeat="conv in project.conversations"></li>
-				</ul>
-			</div>
+			<hr />
+
+			<!-- The conversations accordion -->
+
+			<h2>Conversations:</h2>
+
+			<accordion close-others="true">
+				<accordion-group ng-repeat="conv in currentProject.conversations" heading="{{conv.subject}}">
+				    
+					<!-- List all messages in the current conversation -->
+
+				    <ul class="list-group message-list">
+				        <li class="list-group-item" ng-repeat="message in conv.messages">
+				        	<span class="message-header">{{message.user.nickName}}</span>
+				        	<span class="message-time">{{message.modified | fromNow}}</span>
+				        	<blockquote class="message-body">{{message.message}}</blockquote>
+				        </li>
+				    </ul>
+
+				    <!-- Show this form when the new message button is clicked -->
+
+				    <form name="form" role="form" ng-show="isNewMessage">
+				    	<label for="newMessage" class="new-message-label">New Message:</label>
+				    	<textarea id="newMessage" class="form-control" ng-model="newMessage"></textarea>
+				    </form>
+
+					<button class="btn btn-xs btn-primary" ng-show="!isNewMessage" ng-click="isNewMessage = !isNewMessage">New Message</button>
+					<button class="btn btn-xs btn-primary" ng-click="saveMessage(newMessage, conv)" ng-show="isNewMessage">Post</button>
+					<button class="btn btn-xs btn-primary" ng-show="isNewMessage" ng-click="newMessage = ''; isNewMessage = !isNewMessage">Cancel</button>
+
+				</accordion-group>
+			</accordion>
+
+			<!-- Show this form when the new conversation button is clicked -->
+
+			<form class="form-horizontal" role="form" name="cForm" ng-show="newConversation" novalidate>
+
+				<div class="form-group">
+					<label for="subject" class="col-md-2 control-label new-conv-label">Subject:</label>
+					<div class="col-md-7">
+						<input type="text" id="subject" class="form-control" name="cSubject" ng-model="conversationSubject" placeholder="Enter conversation subject" required>
+					</div>
+					<span class="alert alert-danger col-md-3 proj-error" ng-show="cForm.cSubject.$error.required">  Subject is required </span>
+				</div>
+
+			</form>
+
 			<div class="">
-				<button class="btn btn-primary" ng-click="convOpen()">New Conversation</button> 
+				<button class="btn btn-sm btn-primary pull-right new-conv-button" ng-click="newConversation = !newConversation" ng-hide="newConversation">New Conversation</button> 
+				<button class="btn btn-sm btn-primary pull-right cancel-button" ng-click="conversationSubject = ''; newConversation = !newConversation" ng-show="newConversation">Cancel</button>
+				<button class="btn btn-sm btn-primary pull-right" ng-click="saveConversation(conversationSubject)" ng-show="newConversation" ng-disabled="cForm.$invalid">Save</button>
 			</div>
+
 		</div>
+
+		<div ng-show="uLoading" class="loading"><img class="loader" src="../images/loading_transparent.gif"></div>
+
 	</div>
-	<div class="right-pane col-md-2">
+
+	<!-- The panes on the right side of the viewport -->
+
+	<div class="right-pane col-md-3">
+
+		<!-- The pane that lists all of the projects -->
+
 		<div class="project-pane jumbotron col-md-12">
 			<p>Projects</p>
 			<ul ng-show="!isEmpty" class="project-list list-group">
-				<li class="list-group-item pane-list" ng-repeat="project in projects"><a class="project-button" ng-click="openProject(project)">{{project.title}}</a></li>
+				<li class="list-group-item pane-list" ng-repeat="project in projects">
+					<a class="project-button" ng-click="openProject(project)">{{project.title}}</a>
+					<a class="project-button pull-right"><i class="glyphicon glyphicon-edit"></i></a>
+				</li>
 			</ul>
 
 			<div ng-show="isEmpty" class="no-project">
 				<p>No Projects!</p>
 				<button class="btn btn-primary" ng-click="open()">Add Project</button>
 			</div>
+
+			<div ng-show="pLoading" class="loading"><img class="loader" src="../images/loading_transparent.gif"></div>
+
 		</div>
+
+		<!-- This pane shows a list of all users that are working on the currently selected project -->
+
 		<div class="users-pane jumbotron col-md-12">
 			<p>Devs</p>
 			<ul class="user-list list-group">
-				<li class="list-group-item pane-list" ng-repeat="user in projectTeam">
+				<li class="list-group-item pane-list" ng-repeat="user in currentProject.team">
 					{{user.firstName}} {{user.lastName}}
 				</li>
 			</ul>
 		</div>
+
 	</div>
+
 </div>
-
-<script type="text/ng-template" id="newProjectModal.html">
-	
-	<div class="modal-header">
-		<h2>Add New Project</h2>
-	</div>
-	<div class="modal-body">
-		<form class="form-horizontal" role="form" name="form" novalidate>
-
-			<div class="form-group">
-				<label for="title" class="col-md-3 control-label">Project Name</label>
-				<div class="col-md-6">
-					<input type="text" id="title" class="form-control" name="pTitle" ng-model="projectTitle" placeholder="Enter project name" required>
-				</div>
-				<span class="alert alert-danger col-md-3 proj-error" ng-show="form.pTitle.$error.required">  Project name is required </span>
-			</div>
-
-			<div class="form-group">
-				<label for="description" class="col-md-3 control-label">Project Description</label>
-				<div class="col-md-6">
-					<textarea id="description" class="form-control" rows="2" name="pDesc" placeholder="Enter description" ng-model="projectDesc" required></textarea>
-				</div>
-				<span class="col-md-3 alert alert-danger proj-error" ng-show="form.pDesc.$error.required">  Description is required </span>
-			</div>
-
-			<div class="form-group">
-				<label for="status" class="col-md-3 control-label">Project Status</label>
-				<div class="col-md-6">
-					<select id="status" class="form-control" ng-model="selectedItem" ng-options="item for item in items" required>
-					</select>
-				</div>
-			</div>
-
-			<div class="form-group">
-				<label for="dueDate" class="col-md-3 control-label">Due Date</label>
-				<div class="col-md-6">
-			        <input type="text" class="form-control" name="pDate" datepicker-popup="dd-MMMM-yyyy" ng-model="dt" is-open="opened" min="minDate" max="'2015-06-22'" datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" />
-				</div>
-				<span class="col-md-3 alert alert-danger proj-error" ng-show="form.pDate.$error.required">  Due date is required </span>
-			</div>
-
-			<div class="form-group">
-				<label for="team" class="col-md-3 control-label">Select Devs</label>
-				<div class="col-md-6">
-					<select type="email" id="team" class="form-control" ng-model="selectedUser" ng-options="user as user.firstName + ' ' + user.lastName for user in users">
-					</select>
-				</div>
-				<button class="col-md-2 btn btn-primary" ng-click="addUser(selectedUser)">Add Dev</button>
-			</div>
-			<hr />
-			<div class="project-users">
-				<h3>Project Devs</h3>
-
-				<div id="userWarning" class="shown user-alert">
-					<span class="alert alert-danger proj-error">You must have at least one developer in the project!!!</span>
-				</div>
-
-				<ul class="list-group">
-					<li class="list-group-item col-md-3 project-user" ng-repeat="user in projectUsers">
-						{{user.firstName}} {{user.lastName}}
-						<button type="button" class="close" aria-hidden="true" ng-click="removeUser(user)">&times;</button>
-					</li>
-				</ul>
-			</div>
-
-			<div class="col-md-1"></div>
-			
-		</form> 
-	</div>
-	<div class="modal-footer">
-		<button class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="cancel()">Cancel</button>
-		<button id="saveProject" class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="ok(projectTitle, projectDesc)" disabled="disabled">Save</button>
-	</div>
-</script>
-
-<script type="text/ng-template" id="newConversationModal.html">
-
-	<div class="modal-header">
-		<h3>New Conversation</h3>
-	</div>
-
-	<div class="modal-body">
-		<form class="form-horizontal" role="form" name="form" novalidate>
-
-			<div class="form-group">
-				<label for="subject" class="col-md-3 control-label">Subject</label>
-				<div class="col-md-6">
-					<input type="text" id="subject" class="form-control" name="cSubject" ng-model="conversationSubject" placeholder="Enter conversation subject" required>
-				</div>
-				<span class="alert alert-danger col-md-3 proj-error" ng-show="form.cSubject.$error.required">  Conversation subject is required </span>
-			</div>
-
-		</form>
-	</div>
-
-	<div class="modal-footer">
-		<button class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="cancel()">Cancel</button>
-		<button id="saveProject" class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="ok(conversationSubject)">Save</button>
-	</div>
-
-</script>
