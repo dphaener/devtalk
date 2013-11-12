@@ -54,35 +54,34 @@
 			<h2>Conversations:</h2>
 
 			<accordion close-others="true">
-				<accordion-group ng-repeat="conv in currentProject.conversations" heading="{{conv.subject}}">
+				<accordion-group ng-repeat="conv in currentProject.conversations" heading="{{conv.subject}}" is-open="conv.open">
 				    <accordion-heading>
 				    	{{conv.subject}}
-				    	<span class="pull-right">
-				    		<a class="project-button pull-right" ng-click="alert('Separate click')">
-				    			<i class="glyphicon glyphicon-edit"></i>
-				    		</a>
+				    	<span class="pull-right conv-button">
+				    		<i ng-click="editConvOpen(conv)" class="glyphicon glyphicon-edit"></i>
 				    	</span>
 				    </accordion-heading>
-					<!-- List all messages in the current conversation -->
 
-				    <ul class="list-group message-list">
-				        <li class="list-group-item message" ng-repeat="message in conv.messages">
-				        	<span class="message-header">{{message.user.nickName}}</span>
-				        	<span class="message-time">&bull;&nbsp;{{message.modified | fromNow}}</span>
-				        	<blockquote class="message-body">{{message.message}}</blockquote>
-				        </li>
-				    </ul>
+				    <div>
+					    <ul class="list-group message-list">
+					        <li class="list-group-item message" ng-repeat="message in conv.messages">
+					        	<span class="message-header">{{message.user.nickName}}</span>
+					        	<span class="message-time">&bull;&nbsp;{{message.modified | fromNow}}</span>
+					        	<blockquote class="message-body">{{message.message}}</blockquote>
+					        </li>
+					    </ul>
 
-				    <!-- Show this form when the new message button is clicked -->
+					    <!-- Show this form when the new message button is clicked -->
 
-				    <form name="form" role="form" ng-show="isNewMessage">
-				    	<label for="newMessage" class="new-message-label">New Message:</label>
-				    	<textarea id="newMessage" class="form-control" ng-model="newMessage"></textarea>
-				    </form>
+					    <form name="form" role="form" ng-show="isNewMessage">
+					    	<label for="newMessage" class="new-message-label">New Message:</label>
+					    	<textarea id="newMessage" class="form-control" ng-model="newMessage"></textarea>
+					    </form>
 
-					<button class="btn btn-xs btn-primary" ng-show="!isNewMessage" ng-click="isNewMessage = !isNewMessage">New Message</button>
-					<button class="btn btn-xs btn-primary" ng-click="saveMessage(newMessage, conv)" ng-show="isNewMessage">Post</button>
-					<button class="btn btn-xs btn-primary" ng-show="isNewMessage" ng-click="newMessage = ''; isNewMessage = !isNewMessage">Cancel</button>
+						<button class="btn btn-xs btn-primary" ng-show="!isNewMessage" ng-click="isNewMessage = !isNewMessage">New Message</button>
+						<button class="btn btn-xs btn-primary" ng-click="saveMessage(newMessage, conv, $index, isNewMessage)" ng-show="isNewMessage">Post</button>
+						<button class="btn btn-xs btn-primary" ng-show="isNewMessage" ng-click="newMessage = ''; isNewMessage = !isNewMessage">Cancel</button>
+					</div>
 
 				</accordion-group>
 			</accordion>

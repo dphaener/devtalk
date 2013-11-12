@@ -81,7 +81,7 @@
 	font-size: 14px;
 }
 
-.project-button:hover {
+.project-button:hover, .conv-button:hover {
 	cursor: pointer;
 }
 
@@ -136,5 +136,14 @@
 .message {
 	padding-top: 0px;
 	padding-bottom: 0px;
+}
+
+.subj-modal {
+	overflow: hidden;
+}
+
+.subj-label {
+	margin-top: 5px;
+	text-align: right;
 }
 

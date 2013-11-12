@@ -1,0 +1,20 @@
+<div class="modal-header">
+    <h4>Edit Conversation Subject</h4>
+</div>
+
+<div class="modal-body subj-modal">
+    <form name="cForm" class="form-horizontals" novalidate>
+    	<div class="form-group">
+	    	<label class="col-md-2 subj-label" for="new-subject">Subject</label>
+			<div class="col-md-7">
+				<input id="new-subject" class="form-control" name="nSubj" ng-model="newSubject" required/>
+			</div>
+			<span class="alert alert-danger col-md-3 proj-error" ng-show="cForm.nSubj.$error.required">Subject is required </span>
+		</div>
+	</form>
+</div>
+
+<div class="modal-footer">
+	<button ng-click="ok(newSubject)" class="btn btn-xs btn-primary">Save</button>
+	<button ng-click="cancel()" class="btn btn-xs btn-primary">Cancel</button>
+</div>
