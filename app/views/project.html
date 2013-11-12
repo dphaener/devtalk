@@ -14,7 +14,7 @@
 
   <div class="collapse navbar-collapse navbar-ex1-collapse">
     <ul class="nav navbar-nav">
-      <li><a ng-click="open()" class="project-button">New Project</a></li>
+      <li><a ng-click="projectNew()" class="project-button">New Project</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
       <li><a href="#">Log Out</a></li>
@@ -42,7 +42,7 @@
 			<!-- The project title and details -->
 
 			<div class="project-header">
-				<h1>{{currentProject.title}}</h2>
+				<h1><a>{{currentProject.title}}</a></h1>
 				<h3>Description: {{currentProject.description}}</h3>
 				<h4>Due Date: {{currentProject.dueDate | date}}</h4>
 				<h4>Status: {{currentProject.status}}</h4>
@@ -55,13 +55,20 @@
 
 			<accordion close-others="true">
 				<accordion-group ng-repeat="conv in currentProject.conversations" heading="{{conv.subject}}">
-				    
+				    <accordion-heading>
+				    	{{conv.subject}}
+				    	<span class="pull-right">
+				    		<a class="project-button pull-right" ng-click="alert('Separate click')">
+				    			<i class="glyphicon glyphicon-edit"></i>
+				    		</a>
+				    	</span>
+				    </accordion-heading>
 					<!-- List all messages in the current conversation -->
 
 				    <ul class="list-group message-list">
-				        <li class="list-group-item" ng-repeat="message in conv.messages">
+				        <li class="list-group-item message" ng-repeat="message in conv.messages">
 				        	<span class="message-header">{{message.user.nickName}}</span>
-				        	<span class="message-time">{{message.modified | fromNow}}</span>
+				        	<span class="message-time">&bull;&nbsp;{{message.modified | fromNow}}</span>
 				        	<blockquote class="message-body">{{message.message}}</blockquote>
 				        </li>
 				    </ul>
@@ -117,7 +124,7 @@
 			<ul ng-show="!isEmpty" class="project-list list-group">
 				<li class="list-group-item pane-list" ng-repeat="project in projects">
 					<a class="project-button" ng-click="openProject(project)">{{project.title}}</a>
-					<a class="project-button pull-right"><i class="glyphicon glyphicon-edit"></i></a>
+					<a class="project-button pull-right" ng-click="projectEdit(project)"><i class="glyphicon glyphicon-edit"></i></a>
 				</li>
 			</ul>
 

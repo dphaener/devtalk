@@ -1,13 +1,14 @@
 angular.module('devtalkApp')
   .controller('ProjectCtrl', function ($scope, $http, $location, $log, $modal, $routeParams) {
-  		$scope.users = [];
   		$scope.isEmpty = true;
   		$scope.projectSelected = false;
       $scope.pLoading = true;
       $scope.uLoading = true;
       $scope.newConversation = false;
       $scope.isNewMessage = false;
+      $scope.isEdit = false;
 
+      $scope.users = [];
       $scope.currentProject = [];
 
       // Initialize User list
@@ -127,9 +128,29 @@ angular.module('devtalkApp')
             });
       };
 
+      $scope.projectEdit = function (project) {
+        $scope.isEdit = true;
+        $scope.open(project);
+      };
+
+      $scope.projectNew = function (project) {
+        $scope.isEdit = false;
+        $scope.open(project);
+      }
+
       // New Project Dialog
 
-	    $scope.open = function () {
+	    $scope.open = function (project) {
+
+        if (typeof project === 'undefined') {
+          var project = {
+            title: '',
+            description: '',
+            status: '',
+            dueDate: new Date(),
+            team: []
+          };
+        };
 
 		    var modalInstance = $modal.open({
 		      templateUrl: 'views/templates/newProjectModal.html',
@@ -139,16 +160,27 @@ angular.module('devtalkApp')
 		      resolve: {
 		        users: function () {
 		        	return $scope.users;
-		        }
+		        },
+            project: function () {
+              return project;
+            },
+            isEdit: function () {
+              return $scope.isEdit;
+            }
 		      }
 		    });
 
-		    modalInstance.result.then(function (newProject) {
-		    	$http({
-			    	method: 'POST',
-			    	url: 'http://geekwise-angularjs.herokuapp.com/darin/projects',
-			    	data : Project
-				    }).success(function (data, status, headers, config) {
+		    modalInstance.result.then(function (project) {
+          console.log(project.description + project.status);
+		    	if (project.isEdit === true) {
+            $http({
+            method: 'PUT',
+            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/'+project._id,
+            data: {
+              description: project.description,
+              status: project.status
+            }
+            }).success(function (data, status, headers, config) {
               $scope.pLoading = true;
               $http({
                 method: 'GET',
@@ -157,15 +189,58 @@ angular.module('devtalkApp')
                   $scope.projects = data;
                   $scope.isEmpty = false;
                   $scope.pLoading = false;
-                  $scope.currentProject = newProject;
+                  $scope.currentProject = project;
                   $scope.projectSelected = true;
                 }).error(function (data, status, headers, config) {
                   
                 });
-				    }).error(function (data, status, headers, config) {
+            }).error(function (data, status, headers, config) {
 
-				    });
-		    });
+            });
+          } else {
+            delete project.isEdit;  
+            $http({
+            method: 'POST',
+            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects',
+            data : {
+              title: project.title,
+              description: project.description,
+              status: project.status,
+              dueDate: project.dueDate,
+              team: project.team
+            }
+            }).success(function (data, status, headers, config) {
+              $scope.pLoading = true;
+              $http({
+                method: 'GET',
+                url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
+                }).success(function (data, status, headers, config) {
+                  $scope.projects = data;
+                  $scope.isEmpty = false;
+                  $scope.pLoading = false;
+                  $scope.currentProject = project;
+                  $scope.projectSelected = true;
+                }).error(function (data, status, headers, config) {
+                  
+                });
+            }).error(function (data, status, headers, config) {
+
+            });
+          };
+		    }, function () {
+          $scope.pLoading = true;
+          $http({
+            method: 'GET',
+            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects'
+            }).success(function (data, status, headers, config) {
+              $scope.projects = data;
+              $scope.isEmpty = false;
+              $scope.pLoading = false;
+              $scope.projectSelected = false;
+            }).error(function (data, status, headers, config) {
+              
+            });
+        });
 		  };
   })
   .filter('fromNow', function() {
@@ -176,24 +251,24 @@ angular.module('devtalkApp')
 
 // Controller for New Project Dialog
 
-var ModalInstanceCtrl = function ($scope, $modalInstance, users) {
+var ModalInstanceCtrl = function ($scope, $modalInstance, users, project, isEdit) {
 
-  $scope.dt = new Date();
+  $scope.isEdit = isEdit;
+  $scope.project = project;
   $scope.users = users;
   $scope.items = ['New', 'In Progess', 'Completed'];
-  $scope.selectedItem = $scope.items[0];
+  $scope.project.status = $scope.items[0];
   $scope.selectedUser = $scope.users[0];
-  $scope.projectUsers = [];
-  $scope.userAbsent = true;
+  
+  if ($scope.isEdit === true) {
+    $scope.userAbsent = false;
+  } else {
+    $scope.userAbsent = true;
+  };
 
-  $scope.ok = function (projectTitle, projectDescription) {
-    newProject = {
-      title: projectTitle,
-      description: projectDescription,
-      status: $scope.selectedItem,
-      dueDate: $scope.dt
-    }
-    $modalInstance.close(newProject);
+  $scope.ok = function (project, isEdit) {
+    project.isEdit = isEdit;
+    $modalInstance.close(project);
   };
 
   $scope.cancel = function () {
@@ -203,13 +278,11 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, users) {
   $scope.addUser = function (selectedUser) {
     var i;
 
-    for (i = 0; i < $scope.projectUsers.length; i++) {
-      if ($scope.projectUsers[i]._id === selectedUser._id) { return; }
+    for (i = 0; i < $scope.project.team.length; i++) {
+      if ($scope.project.team[i]._id === selectedUser._id) { return; }
     };
 
-    $scope.projectUsers.push(selectedUser);
-
-    $("#userWarning").css('display', 'none');
+    $scope.project.team.push(selectedUser);
 
     $scope.userAbsent = false;
   };
@@ -217,12 +290,11 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, users) {
   $scope.removeUser = function (user) {
     var i;
 
-    for (i = 0; i < $scope.projectUsers.length; i++) {
-      if ($scope.projectUsers[i]._id === user._id) { $scope.projectUsers.splice(i, 1); }
+    for (i = 0; i < $scope.project.team.length; i++) {
+      if ($scope.project.team[i]._id === user._id) { $scope.project.team.splice(i, 1); }
     };
 
-    if ($scope.projectUsers.length === 0) {
-      $('#userWarning').css('display', 'inline-block');
+    if ($scope.project.team.length === 0) {
       $scope.userAbsent = true;
     };
   }
