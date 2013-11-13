@@ -71,5 +71,6 @@
 
 <div class="modal-footer">
 	<button class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="cancel()">Cancel</button>
+	<button class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-show="isEdit" ng-click="del(project)">Delete</button>
 	<button id="saveProject" class="btn btn-primary col-md-2 bottom-buttons pull-right" ng-click="ok(project, isEdit)" ng-disabled="form.$invalid || userAbsent">Save</button>
 </div>

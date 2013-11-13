@@ -17,7 +17,14 @@
       <li><a ng-click="projectNew()" class="project-button">New Project</a></li>
     </ul>
     <ul class="nav navbar-nav navbar-right">
-      <li><a href="#">Log Out</a></li>
+        <li class="dropdown">
+	        <a href="#" class="dropdown-toggle" data-toggle="dropdown">My Account <b class="caret"></b></a>
+	        <ul class="dropdown-menu">
+	            <li><a ng-click="">Edit Details</a></li>
+	            <li class="divider"></li>
+	            <li><a href="#">Log Out</a></li>
+	        </ul>
+        </li>
     </ul>
   </div>
 </nav>
@@ -56,7 +63,8 @@
 			<accordion close-others="true">
 				<accordion-group ng-repeat="conv in currentProject.conversations" heading="{{conv.subject}}" is-open="conv.open">
 				    <accordion-heading>
-				    	{{conv.subject}}
+				    	{{conv.subject}} 
+				    	<span class="message-count">&nbsp;&nbsp;&bull;&nbsp;&nbsp;{{conv.messages | messageLength}}</span>
 				    	<span class="pull-right conv-button">
 				    		<i ng-click="editConvOpen(conv)" class="glyphicon glyphicon-edit"></i>
 				    	</span>
@@ -88,7 +96,7 @@
 
 			<!-- Show this form when the new conversation button is clicked -->
 
-			<form class="form-horizontal" role="form" name="cForm" ng-show="newConversation" novalidate>
+			<form class="form-horizontal new-conv-form" role="form" name="cForm" ng-show="newConversation" novalidate>
 
 				<div class="form-group">
 					<label for="subject" class="col-md-2 control-label new-conv-label">Subject:</label>

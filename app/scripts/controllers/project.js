@@ -141,25 +141,55 @@ angular.module('devtalkApp')
 		    });
 
 		    modalInstance.result.then(function (project) {
-		    	if (project.isEdit === true) {
+		    	console.log(project.isDelete);
+          if (project.isEdit === true) {
             $scope.pLoading = true;
             $http({
-            method: 'PUT',
-            url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/'+project._id,
-            data: {
-              description: project.description,
-              status: project.status
-            }
-          })
-          .success(function (data, status, headers, config) {
-            $scope.isEmpty = false;
-            $scope.pLoading = false;
-            $scope.currentProject = data[0];
-            $scope.projectSelected = true;
-          })
-          .error(function (data, status, headers, config) {
+              method: 'PUT',
+              url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/'+project._id,
+              data: {
+                description: project.description,
+                status: project.status
+              }
+            })
+            .success(function (data, status, headers, config) {
+              $scope.isEmpty = false;
+              $scope.pLoading = false;
+              $scope.currentProject = data[0];
+              $scope.projectSelected = true;
+            })
+            .error(function (data, status, headers, config) {
 
-          });
+            });
+          } else if (project.isDelete === true ) {
+            if (window.confirm("Are you sure you want to delete this project?\n This cannot be undone!")) {
+              $scope.pLoading = true;
+              $http({
+                method: 'DELETE',
+                url: 'http://geekwise-angularjs.herokuapp.com/darin/projects/'+project._id,
+              })
+              .success(function (data, status, headers, config) {
+                $scope.pLoading = false;
+                var i = $scope.projects.indexOf(project._id);
+                $scope.projects.splice(i, 1);
+
+                if ($scope.projects.length === 0) {
+                  $scope.isEmpty = true;
+                  $scope.currentProject = [];
+                  $scope.projectSelected = false;
+                } else {
+                  $scope.isEmpty = false;
+                  $scope.currentProject = [];
+                  $scope.projectSelected = false;
+                };
+
+              })
+              .error(function (data, status, headers, config) {
+
+              });
+            } else {
+              return;
+            }
           } else {
             $scope.pLoading = true;
             var i;
@@ -181,6 +211,7 @@ angular.module('devtalkApp')
               }
             })
             .success(function (data, status, headers, config) {
+              $scope.projects.push(data[0]);
               $scope.pLoading = false;
               $scope.isEmpty = false;
               $scope.currentProject = data[0];
@@ -244,10 +275,21 @@ angular.module('devtalkApp')
         conversation.open = true;
       };
   })
-  .filter('fromNow', function() {
+  .filter('fromNow', function () {
     return function(dateString) {
       return moment(dateString).fromNow()
     };
+  })
+  .filter('messageLength', function () {
+    return function(string) {
+      if (string.length === 0) {
+        return "No messages"
+      } else if (string.length === 1) {
+        return "1 message"
+      } else {
+        return string.length + " messages"
+      }
+    }
   })
 
 // Controller for New Project Dialog
@@ -274,7 +316,12 @@ var ModalInstanceCtrl = function ($scope, $modalInstance, users, project, isEdit
 
   $scope.cancel = function () {
     $modalInstance.dismiss('cancel');
-  };
+  }
+
+  $scope.del = function (project) {
+    project.isDelete = true;
+    $modalInstance.close(project);
+  }
 
   $scope.addUser = function (selectedUser) {
     var i;
